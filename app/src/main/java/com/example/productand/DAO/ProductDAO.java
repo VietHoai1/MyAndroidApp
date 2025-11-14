@@ -97,4 +97,8 @@ public class ProductDAO {
         int rows = db.delete("tb_product", "id = ?", params);
         return rows > 0;
     }
+
+    public void clearAll() {
+        db.execSQL("DELETE FROM tb_product");
+    }
     }

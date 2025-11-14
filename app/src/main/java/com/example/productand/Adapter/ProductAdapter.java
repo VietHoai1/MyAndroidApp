@@ -1,16 +1,20 @@
 package com.example.productand.Adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.productand.DAO.ProductDAO;
 import com.example.productand.DTO.ProductDTO;
 import com.example.productand.R;
 
@@ -21,9 +25,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
     Context context;
     ArrayList<ProductDTO> list;
 
+    ProductDAO productDAO;
+
     public ProductAdapter(Context context, ArrayList<ProductDTO> list) {
         this.context = context;
         this.list = list;
+        productDAO = new ProductDAO(context);
     }
 
     @NonNull
@@ -36,6 +43,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        int index = position;
         // lấy 1 dòng dữ liệu trong list
         ProductDTO productDTO = list.get(position);
 
@@ -48,8 +56,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
         holder.img_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: xử lý nút sửa
-                // có thể mở dialog sửa sản phẩm
+                updateRow(productDTO, index);
             }
         });
 
@@ -57,8 +64,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
         holder.img_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: xử lý nút xóa
-                // gọi DAO để delete nếu cần
+                deleteRow(productDTO.getId(), index);
             }
         });
     }
@@ -86,4 +92,53 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
             img_delete = itemView.findViewById(R.id.img_delete);
         }
     }
+
+
+    void deleteRow(int id, int index){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Xac nhan xoa");
+        builder.setMessage("Ban co muon xoa san pham nay khong");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Co", (dialog, which) ->{
+            productDAO.deleteRow(id);
+            list.remove(index);
+            notifyDataSetChanged();
+            dialog.dismiss();
+        });
+        builder.setNegativeButton("Khong", (dialog, which) ->{
+           dialog.dismiss();
+        });
+        builder.show();
+    }
+
+    void updateRow(ProductDTO objProduct, int index){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_edit, null);
+        builder.setView(v);
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        EditText ed_name = v.findViewById(R.id.ed_name);
+        EditText ed_price = v.findViewById(R.id.ed_price);
+        ed_name.setText(objProduct.getName());
+        ed_price.setText(String.valueOf(objProduct.getPrice()));
+
+        Button btn_save = v.findViewById(R.id.btn_save);
+        btn_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                objProduct.setName(ed_name.getText().toString());
+                String priceStr = ed_price.getText().toString();
+                double price = Double.parseDouble(priceStr);
+                objProduct.setPrice(price);
+                productDAO.updateRow(objProduct);
+                list.set(index, objProduct);
+                notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    };
+
+
 }

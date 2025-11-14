@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         productDAO = new ProductDAO(this);
+
+        productDAO.clearAll();
         ProductDTO p1 = new ProductDTO();
         p1.setName("Điện thoại");
         p1.setPrice(5000);
@@ -50,8 +52,11 @@ public class MainActivity extends AppCompatActivity {
         p3.setPrice(12000);
         productDAO.addProduct(p3);
 
+
+
         list = productDAO.getAllProduct();
         adapter = new ProductAdapter(this, list);
+        rc_product = findViewById(R.id.rc_product);
         rc_product.setAdapter(adapter);
     }
 }
