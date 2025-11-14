@@ -8,7 +8,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.productand.DAO.ProductDAO;
+import com.example.productand.DTO.ProductDTO;
+
 public class MainActivity extends AppCompatActivity {
+    ProductDAO productDAO;
+    static String TAG = "ZZZZZZZZZZZZ";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +26,21 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        productDAO = new ProductDAO(this);
+        ProductDTO p1 = new ProductDTO();
+        p1.setName("Điện thoại");
+        p1.setPrice(5000);
+        productDAO.addProduct(p1);
+
+        ProductDTO p2 = new ProductDTO();
+        p2.setName("Tivi");
+        p2.setPrice(7000);
+        productDAO.addProduct(p2);
+
+        ProductDTO p3 = new ProductDTO();
+        p3.setName("Tủ lạnh");
+        p3.setPrice(12000);
+        productDAO.addProduct(p3);
     }
 }
